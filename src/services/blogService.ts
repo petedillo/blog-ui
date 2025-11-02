@@ -17,4 +17,8 @@ export const blogService = {
     });
     return response.data;
   },
+  getPostBySlug: async (slug: string): Promise<BlogPost> => {
+    const response = await api.get(`/posts/${slug}`);
+    return response.data;
+  },
 };
