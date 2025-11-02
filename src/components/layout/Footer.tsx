@@ -7,7 +7,7 @@ const Footer: React.FC = () => {
       <Container className="py-8 text-center">
         <p>&copy; {new Date().getFullYear()} PeteDillo.com. All rights reserved.</p>
         <p className="text-sm text-gray-400 mt-2">
-          Built with React, Spring Boot.
+          Built with React and Spring Boot.
         </p>
       </Container>
     </footer>
