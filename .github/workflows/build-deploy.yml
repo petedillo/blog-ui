@@ -11,7 +11,7 @@ on:
       - develop
 
 env:
-  NEXUS_REGISTRY: registry.toastedbytes.com/repository/docker
+  NEXUS_REGISTRY: docker.registry.toastedbytes.com
 
 jobs:
   build-and-deploy:
