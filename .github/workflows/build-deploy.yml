@@ -1,0 +1,72 @@
+name: Build and Deploy UI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+env:
+  NEXUS_REGISTRY: registry.toastedbytes.com/repository/docker
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Determine Docker tag
+        id: docker-tag
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "tag=main-latest" >> $GITHUB_OUTPUT
+            echo "env=prod" >> $GITHUB_OUTPUT
+          else
+            echo "tag=develop-latest" >> $GITHUB_OUTPUT
+            echo "env=dev" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Log in to Nexus Docker Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.NEXUS_REGISTRY }}
+          username: ${{ secrets.NEXUS_USERNAME }}
+          password: ${{ secrets.NEXUS_PASSWORD }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.NEXUS_REGISTRY }}/blog-ui:${{ steps.docker-tag.outputs.tag }}
+            ${{ env.NEXUS_REGISTRY }}/blog-ui:${{ github.sha }}
+
+      - name: Summary
+        run: |
+          echo "### Deployment Summary :rocket:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Environment**: ${{ steps.docker-tag.outputs.env }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Docker Image**: \`blog-ui:${{ steps.docker-tag.outputs.tag }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit SHA**: \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
