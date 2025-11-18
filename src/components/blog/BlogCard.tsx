@@ -17,8 +17,8 @@ const BlogCard: React.FC<BlogCardProps> = ({ post }) => {
             <img
                 src={coverImageUrl}
                 alt={altText}
-                className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                onError={(e) => { e.currentTarget.src = 'https://via.placeholder.com/400x240?text=Image+not+found'; }}
+                className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300 bg-gray-200"
+                onError={(e) => { e.currentTarget.style.backgroundColor = '#e5e7eb'; }}
             />
             <div className="p-6 flex flex-col flex-grow">
                 <h3 className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
