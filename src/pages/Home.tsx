@@ -6,10 +6,10 @@ const Home: React.FC = () => {
   return (
     <Container className="text-center py-16 md:py-24">
       <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
-        Welcome to My Digital Garden
+        Welcome to My Living Portfolio/Blog
       </h1>
       <p className="mt-4 text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
-        I'm Pete Dillo, a software engineer exploring tech, homelabs, and everything in between. This is where I share my projects, learnings, and thoughts.
+        I'm Pedro, a software engineer and project manager exploring tech, homelabs, and everything in between. This is where I share my projects, learnings, and thoughts.
       </p>
       <div className="mt-8 flex justify-center gap-4">
         <Link
