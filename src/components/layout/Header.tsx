@@ -2,10 +2,11 @@ import React from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import Container from './Container';
 import { Menu } from 'lucide-react';
+import { useEnvironment } from '../../hooks/useEnvironment';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-  const environment = import.meta.env.VITE_ENVIRONMENT || 'dev';
+  const { info } = useEnvironment();
 
   const navLinkClass = ({ isActive }: { isActive: boolean }) =>
     `font-medium transition-colors ${isActive ? 'link-neon-active' : 'link-neon'}`;
@@ -18,9 +19,13 @@ const Header: React.FC = () => {
 
   return (
     <>
-      {environment !== 'prod' && (
-        <div className={`text-center py-1 text-xs font-semibold border-b ${envBadgeColors[environment as keyof typeof envBadgeColors]}`}>
-          {environment.toUpperCase()} ENVIRONMENT
+      {info && info.environment !== 'prod' && (
+        <div className={`text-center py-1 text-xs font-semibold border-b ${envBadgeColors[info.environment]}`}>
+          <div className="flex items-center justify-center gap-3">
+            <span>{info.environment.toUpperCase()} ENVIRONMENT</span>
+            <span className="opacity-70">•</span>
+            <span className="opacity-70">{info.name} v{info.version}</span>
+          </div>
         </div>
       )}
       <header className="header-neon">
