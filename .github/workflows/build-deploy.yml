@@ -104,6 +104,33 @@ jobs:
             ${{ env.NEXUS_REGISTRY }}/blog-ui:${{ steps.docker-tag.outputs.tag }}
             ${{ env.NEXUS_REGISTRY }}/blog-ui:${{ github.sha }}
 
+      - name: Update GitOps repository
+        if: github.ref == 'refs/heads/develop'
+        run: |
+          # Clone the gitops repository
+          git clone https://${{ secrets.GITOPS_REPO_TOKEN }}@github.com/petedillo/blog-gitops.git
+          cd blog-gitops
+
+          # Configure git
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Update the image tag in the deployment manifest
+          cd kubernetes/base/blog-ui
+
+          # Update deployment.yaml with new image tag
+          sed -i 's|image: docker.toastedbytes.com/blog-ui:.*|image: docker.toastedbytes.com/blog-ui:${{ github.sha }}|g' deployment.yaml
+
+          # Commit and push changes
+          git add deployment.yaml
+          git commit -m "Deploy blog-ui ${{ github.sha }} to dev environment
+
+          Automated deployment from blog-ui repository
+          Commit: ${{ github.sha }}
+          Workflow: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+          git push origin main
+
       - name: Summary
         run: |
           echo "### Deployment Summary :rocket:" >> $GITHUB_STEP_SUMMARY
@@ -112,3 +139,6 @@ jobs:
           echo "- **Docker Image**: \`blog-ui:${{ steps.docker-tag.outputs.tag }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- **Commit SHA**: \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- **Registry**: ${{ env.NEXUS_REGISTRY }}" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ github.ref }}" == "refs/heads/develop" ]]; then
+            echo "- **GitOps Update**: Triggered ArgoCD sync for dev environment" >> $GITHUB_STEP_SUMMARY
+          fi
