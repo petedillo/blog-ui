@@ -1,5 +1,5 @@
 import React from 'react';
-import { useEnvironment, Environment } from '../hooks/useEnvironment';
+import { useEnvironment, type Environment } from '../hooks/useEnvironment';
 
 const getEnvironmentStyles = (env: Environment) => {
   switch (env) {
