@@ -7,7 +7,7 @@ const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
   const navLinkClass = ({ isActive }: { isActive: boolean }) =>
-    `font-medium transition-all ${isActive ? 'text-neon-cyan shadow-neon-cyan' : 'text-neon-blue hover:text-neon-cyan'}`;
+    `font-medium transition-all pb-1 ${isActive ? 'text-neon-cyan border-b-2 border-neon-cyan' : 'text-neon-blue hover:text-neon-cyan border-b-2 border-transparent'}`;
 
   return (
     <header className="bg-overlay border-b border-neon-cyan/30 sticky top-0 z-40 backdrop-blur-sm">
