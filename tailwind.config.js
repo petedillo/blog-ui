@@ -7,6 +7,19 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Neon Cyberpunk Theme
+        'dark-bg': '#0A0F24',
+        'neon-cyan': '#00FFFF',
+        'neon-green': '#00FF7F',
+        'neon-blue': '#5C9EFF',
+        'overlay': 'rgba(10, 15, 36, 0.95)',
+
+        // Keep utility colors
+        'error': '#FF0055',
+        'warning': '#FFD700',
+        'success': '#00FF7F',
+
+        // Legacy colors for compatibility
         primary: {
           50: '#EFF6FF',
           100: '#DBEAFE',
@@ -44,13 +57,18 @@ export default {
           600: '#DC2626',
         },
         yellow: {
-            500: '#F59E0B',
-            600: '#D97706',
+          500: '#F59E0B',
+          600: '#D97706',
         }
       },
+      boxShadow: {
+        'neon-cyan': '0 0 10px rgba(0, 255, 255, 0.5), 0 0 20px rgba(0, 255, 255, 0.3)',
+        'neon-green': '0 0 10px rgba(0, 255, 127, 0.5), 0 0 20px rgba(0, 255, 127, 0.3)',
+        'neon-blue': '0 0 10px rgba(92, 158, 255, 0.5), 0 0 20px rgba(92, 158, 255, 0.3)',
+      },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-        mono: ['Fira Code', 'monospace'],
+        'mono': ['JetBrains Mono', 'Courier New', 'monospace'],
+        'sans': ['Inter', 'system-ui', 'sans-serif'],
       },
     },
   },

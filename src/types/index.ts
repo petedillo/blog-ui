@@ -10,8 +10,8 @@ export interface BlogPost {
   createdAt: string;
   updatedAt: string;
   publishedAt: string;
-  tags: string[];
-  media: Media[];
+  tags?: string[];
+  media?: Media[];
   coverImage?: {
     url: string;
     altText: string;
