@@ -25,7 +25,7 @@ const SearchPage: React.FC = () => {
 
   return (
     <Container className="py-12">
-      <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8 text-center">
+      <h1 className="heading-neon-primary mb-8 text-center">
         Search Posts
       </h1>
       <form onSubmit={handleSearch} className="relative w-full max-w-lg mx-auto mb-12">
@@ -33,15 +33,15 @@ const SearchPage: React.FC = () => {
           type="search"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
-          className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+          className="input-neon w-full pl-12"
           placeholder="Search by title or tag..."
         />
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neon-blue" />
       </form>
 
       {query && (
         <div className="mt-8">
-            <h2 className="text-2xl font-semibold mb-4">
+            <h2 className="heading-neon-secondary mb-4">
                 Results for "{query}"
             </h2>
             <BlogList posts={results} loading={loading} error={error} />

@@ -23,23 +23,25 @@ const BlogPostPage: React.FC = () => {
     <Container className="py-12 max-w-4xl mx-auto">
       <article>
         <header className="mb-8">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight mb-4">
+          <h1 className="heading-neon-primary mb-4">
             {post.title}
           </h1>
-          <div className="text-gray-500 text-sm">
+          <div className="text-neon-meta">
             <span>Published on {formatDate(post.publishedAt)}</span>
             <span className="mx-2">•</span>
             <span>{post.viewCount} views</span>
           </div>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {post.tags.map(tag => (
-              <span key={tag} className="inline-block px-3 py-1 bg-blue-100 text-blue-700 text-sm font-medium rounded-full">
-                {tag}
-              </span>
-            ))}
-          </div>
+          {post.tags && post.tags.length > 0 && (
+            <div className="mt-4 flex flex-wrap gap-2">
+              {post.tags.map(tag => (
+                <span key={tag} className="tag-neon">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
         </header>
-        <div className="prose lg:prose-xl max-w-none">
+        <div className="prose prose-invert lg:prose-xl max-w-none prose-headings:text-neon-green prose-p:text-neon-cyan prose-a:text-neon-blue prose-strong:text-neon-green prose-code:text-neon-cyan prose-pre:bg-overlay prose-pre:border prose-pre:border-neon-cyan/30 prose-li:text-neon-cyan prose-blockquote:text-neon-blue prose-blockquote:border-neon-cyan">
           <ReactMarkdown>{post.content}</ReactMarkdown>
         </div>
       </article>

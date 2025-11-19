@@ -5,35 +5,49 @@ import { Menu } from 'lucide-react';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+  const environment = import.meta.env.VITE_ENVIRONMENT || 'dev';
 
   const navLinkClass = ({ isActive }: { isActive: boolean }) =>
-    `font-medium transition-colors ${isActive ? 'text-blue-600' : 'text-gray-700 hover:text-blue-600'}`;
+    `font-medium transition-colors ${isActive ? 'link-neon-active' : 'link-neon'}`;
+
+  const envBadgeColors = {
+    prod: 'bg-red-500/20 border-red-500 text-red-400',
+    stage: 'bg-yellow-500/20 border-yellow-500 text-yellow-400',
+    dev: 'bg-neon-green/20 border-neon-green text-neon-green'
+  };
 
   return (
-    <header className="bg-white/80 backdrop-blur-sm sticky top-0 z-10 border-b border-gray-200">
-      <Container className="flex items-center justify-between h-16">
-        <Link to="/" className="text-2xl font-bold text-gray-900">
-          PeteDillo.com
-        </Link>
-        <nav className="hidden md:flex space-x-8">
-          <NavLink to="/" className={navLinkClass}>Home</NavLink>
-          <NavLink to="/blog" className={navLinkClass}>Blog</NavLink>
-          <NavLink to="/search" className={navLinkClass}>Search</NavLink>
-        </nav>
-        <button className="md:hidden p-2 text-gray-700 hover:text-blue-600" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-          <Menu className="w-6 h-6" />
-        </button>
-      </Container>
-      {isMenuOpen && (
-        <div className="md:hidden bg-white border-t border-gray-200">
-            <nav className="flex flex-col items-center space-y-4 py-4">
-                <NavLink to="/" className={navLinkClass} onClick={() => setIsMenuOpen(false)}>Home</NavLink>
-                <NavLink to="/blog" className={navLinkClass} onClick={() => setIsMenuOpen(false)}>Blog</NavLink>
-                <NavLink to="/search" className={navLinkClass} onClick={() => setIsMenuOpen(false)}>Search</NavLink>
-            </nav>
+    <>
+      {environment !== 'prod' && (
+        <div className={`text-center py-1 text-xs font-semibold border-b ${envBadgeColors[environment as keyof typeof envBadgeColors]}`}>
+          {environment.toUpperCase()} ENVIRONMENT
         </div>
       )}
-    </header>
+      <header className="header-neon">
+        <Container className="flex items-center justify-between h-16">
+          <Link to="/" className="text-2xl font-bold text-neon-green hover:text-neon-cyan transition-colors">
+            PeteDillo.com
+          </Link>
+          <nav className="hidden md:flex space-x-8">
+            <NavLink to="/" className={navLinkClass}>Home</NavLink>
+            <NavLink to="/blog" className={navLinkClass}>Blog</NavLink>
+            <NavLink to="/search" className={navLinkClass}>Search</NavLink>
+          </nav>
+          <button className="md:hidden p-2 text-neon-cyan hover:text-neon-green transition-colors" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            <Menu className="w-6 h-6" />
+          </button>
+        </Container>
+        {isMenuOpen && (
+          <div className="md:hidden border-t border-neon-cyan/30">
+              <nav className="flex flex-col items-center space-y-4 py-4">
+                  <NavLink to="/" className={navLinkClass} onClick={() => setIsMenuOpen(false)}>Home</NavLink>
+                  <NavLink to="/blog" className={navLinkClass} onClick={() => setIsMenuOpen(false)}>Blog</NavLink>
+                  <NavLink to="/search" className={navLinkClass} onClick={() => setIsMenuOpen(false)}>Search</NavLink>
+              </nav>
+          </div>
+        )}
+      </header>
+    </>
   );
 };
 

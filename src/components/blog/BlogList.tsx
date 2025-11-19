@@ -20,7 +20,7 @@ const BlogList: React.FC<BlogListProps> = ({ posts, loading, error }) => {
   }
 
   if (posts.length === 0) {
-    return <p className="text-center text-gray-500">No posts found.</p>;
+    return <p className="text-center text-neon-meta">No posts found.</p>;
   }
 
   return (

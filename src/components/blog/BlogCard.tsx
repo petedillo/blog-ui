@@ -13,21 +13,30 @@ const BlogCard: React.FC<BlogCardProps> = ({ post }) => {
 
   return (
     <Link to={`/blog/${post.slug}`} className="block group">
-        <article className="bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-200 overflow-hidden h-full flex flex-col">
+        <article className="card-neon h-full flex flex-col">
             <img
                 src={coverImageUrl}
                 alt={altText}
-                className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300 bg-gray-200"
-                onError={(e) => { e.currentTarget.style.backgroundColor = '#e5e7eb'; }}
+                className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300 bg-overlay"
+                onError={(e) => { e.currentTarget.style.backgroundColor = '#1a1a2e'; }}
             />
             <div className="p-6 flex flex-col flex-grow">
-                <h3 className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
+                <h3 className="text-xl font-semibold text-neon-green mb-2 group-hover:text-neon-cyan transition-colors">
                     {post.title}
                 </h3>
-                <p className="text-gray-600 mb-4 line-clamp-3 flex-grow">{post.excerpt}</p>
+                <p className="text-neon-body mb-4 line-clamp-3 flex-grow">{post.excerpt}</p>
+                {post.tags && post.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {post.tags.map(tag => (
+                      <span key={tag} className="tag-neon text-xs">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
                 <div className="flex items-center justify-between mt-auto">
-                    <span className="text-sm text-gray-500">{formatDate(post.publishedAt)}</span>
-                    <span className="text-blue-600 font-medium">Read more →</span>
+                    <span className="text-neon-meta">{formatDate(post.publishedAt)}</span>
+                    <span className="text-neon-blue font-medium group-hover:text-neon-cyan transition-colors">Read more →</span>
                 </div>
             </div>
         </article>
