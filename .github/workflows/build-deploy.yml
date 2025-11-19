@@ -14,7 +14,48 @@ env:
   NEXUS_REGISTRY: docker.toastedbytes.com
 
 jobs:
-  build-and-deploy:
+  # PR builds: Test and validate only, no deployment
+  build:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Build Docker image (validation only)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: false
+          tags: blog-ui:pr-${{ github.event.pull_request.number }}
+
+      - name: Summary
+        run: |
+          echo "### Build Validation :white_check_mark:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **PR #${{ github.event.pull_request.number }}**: Build successful" >> $GITHUB_STEP_SUMMARY
+          echo "- **Target Branch**: ${{ github.base_ref }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status**: Ready for review (no deployment on PR)" >> $GITHUB_STEP_SUMMARY
+
+  # Push to main/develop: Build, test, and deploy to registry
+  deploy:
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
 
     steps:
@@ -70,3 +111,4 @@ jobs:
           echo "- **Environment**: ${{ steps.docker-tag.outputs.env }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Docker Image**: \`blog-ui:${{ steps.docker-tag.outputs.tag }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- **Commit SHA**: \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Registry**: ${{ env.NEXUS_REGISTRY }}" >> $GITHUB_STEP_SUMMARY
