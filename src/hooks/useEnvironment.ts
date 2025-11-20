@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import api from '../services/api';
 
 export interface EnvironmentInfo {
   environment: 'dev' | 'stage' | 'prod';
@@ -13,17 +14,12 @@ export const useEnvironment = () => {
   useEffect(() => {
     const fetchEnvironment = async () => {
       try {
-        const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1';
-        const response = await fetch(`${apiBaseUrl}/info`);
-        
-        if (response.ok) {
-          const data = await response.json();
-          setInfo({
-            environment: data.environment,
-            name: data.name,
-            version: data.version
-          });
-        }
+        const response = await api.get('/info');
+        setInfo({
+          environment: response.data.environment,
+          name: response.data.name,
+          version: response.data.version
+        });
       } catch (error) {
         console.error('Failed to fetch environment info:', error);
         // Fallback to local env var
