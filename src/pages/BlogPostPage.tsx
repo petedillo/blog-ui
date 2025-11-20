@@ -6,6 +6,15 @@ import Spinner from '../components/common/Spinner';
 import ErrorMessage from '../components/common/ErrorMessage';
 import { formatDate } from '../utils/dateFormatter';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import {
+  NeonTable,
+  NeonTableHead,
+  NeonTableBody,
+  NeonTableRow,
+  NeonTableHeader,
+  NeonTableCell,
+} from '../components/markdown/MarkdownTable';
 
 const BlogPostPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -42,7 +51,19 @@ const BlogPostPage: React.FC = () => {
           )}
         </header>
         <div className="prose prose-invert lg:prose-xl max-w-none prose-headings:text-neon-green prose-p:text-neon-cyan prose-a:text-neon-blue prose-strong:text-neon-green prose-code:text-neon-cyan prose-pre:bg-overlay prose-pre:border prose-pre:border-neon-cyan/30 prose-li:text-neon-cyan prose-blockquote:text-neon-blue prose-blockquote:border-neon-cyan">
-          <ReactMarkdown>{post.content}</ReactMarkdown>
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            components={{
+              table: NeonTable,
+              thead: NeonTableHead,
+              tbody: NeonTableBody,
+              tr: NeonTableRow,
+              th: NeonTableHeader,
+              td: NeonTableCell,
+            }}
+          >
+            {post.content}
+          </ReactMarkdown>
         </div>
       </article>
     </Container>
