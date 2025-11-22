@@ -112,4 +112,4 @@ jobs:
           echo "- **Docker Image**: \`blog-ui:${{ steps.docker-tag.outputs.tag }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- **Commit SHA**: \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- **Registry**: ${{ env.NEXUS_REGISTRY }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **GitOps**: Renovate will detect and update blog-gitops" >> $GITHUB_STEP_SUMMARY
+          echo "- **GitOps**: ArgoCD Image Updater will detect and update blog-gitops" >> $GITHUB_STEP_SUMMARY
