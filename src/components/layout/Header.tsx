@@ -31,7 +31,7 @@ const Header: React.FC = () => {
       <header className="header-neon">
         <Container className="flex items-center justify-between h-16">
           <Link to="/" className="text-2xl font-bold text-neon-green hover:text-neon-cyan transition-colors">
-            PeteDillo.com
+            PeteDio Labs
           </Link>
           <nav className="hidden md:flex space-x-8">
             <NavLink to="/" className={navLinkClass}>Home</NavLink>
