@@ -1,3 +1,15 @@
+export interface Page<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+  numberOfElements: number;
+  first: boolean;
+  last: boolean;
+  empty: boolean;
+}
+
 export interface BlogPost {
   id: number;
   title: string;
@@ -5,17 +17,11 @@ export interface BlogPost {
   content: string;
   excerpt: string;
   status: 'PUBLISHED' | 'DRAFT';
-  isFeatured: boolean;
-  viewCount: number;
+  tags: string[];
+  authorName: string;
   createdAt: string;
   updatedAt: string;
   publishedAt: string;
-  tags: string[];
-  media: Media[];
-  coverImage?: {
-    url: string;
-    altText: string;
-  };
 }
 
 export interface Media {
@@ -25,14 +31,4 @@ export interface Media {
   altText: string;
   caption: string;
   displayOrder: number;
-}
-
-export interface Page<T> {
-  content: T[];
-  page: {
-    size: number;
-    number: number;
-    totalElements: number;
-    totalPages: number;
-  };
 }
