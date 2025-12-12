@@ -20,8 +20,8 @@ export const useSearch = (initialQuery = '') => {
     const search = async () => {
       setLoading(true);
       try {
-        const response = await blogService.searchPosts(debouncedQuery);
-        setResults(response.results);
+        const response: BlogPost[] = await blogService.searchPosts(debouncedQuery);
+        setResults(response);
         setError(null);
       } catch (err) {
         setError('Failed to perform search.');

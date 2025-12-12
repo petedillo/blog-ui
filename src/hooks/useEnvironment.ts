@@ -17,8 +17,8 @@ export const useEnvironment = () => {
         const response = await api.get('/info');
         setInfo({
           environment: response.data.environment,
-          name: response.data.name,
-          version: response.data.version
+          name: 'Blog API',
+          version: response.data.apiVersion || response.data.version || 'unknown'
         });
       } catch (error) {
         console.error('Failed to fetch environment info:', error);
