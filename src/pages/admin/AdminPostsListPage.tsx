@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { adminService } from '../../services/adminService';
 
-interface Post {
+interface PostListPost {
   id: number;
   title: string;
   slug: string;
@@ -13,7 +14,7 @@ interface Post {
 }
 
 export default function AdminPostsListPage() {
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [posts, setPosts] = useState<PostListPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'DRAFT' | 'PUBLISHED'>('ALL');
@@ -24,10 +25,8 @@ export default function AdminPostsListPage() {
   const loadPosts = useCallback(async (_pageNum: number) => {
     try {
       setLoading(true);
-      // TODO: Implement adminService.getPosts() call in Task 14
-      // const response = await adminService.getPosts(pageNum, 20, statusFilter, search);
-      // setPosts(prev => pageNum === 0 ? response.posts : [...prev, ...response.posts]);
-      // setHasMore(response.hasMore);
+      const response = await adminService.getPosts(_pageNum, 20, statusFilter, search);
+      setPosts(prev => _pageNum === 0 ? response.content : [...prev, ...response.content]);
     } catch (error) {
       toast.error('Failed to load posts');
     } finally {
@@ -60,7 +59,7 @@ export default function AdminPostsListPage() {
   const handleDelete = async (id: number) => {
     if (confirm('Are you sure you want to delete this post?')) {
       try {
-        // TODO: Implement adminService.deletePost(id) in Task 14
+        await adminService.deletePost(id);
         setPosts(posts.filter(p => p.id !== id));
         toast.success('Post deleted');
       } catch (error) {
