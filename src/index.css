@@ -83,8 +83,29 @@
 
   /* Input styles */
   .input-neon {
-    @apply bg-dark-bg border-2 border-neon-blue text-neon-cyan rounded-lg px-4 py-3
+    @apply bg-dark-bg border-2 border-neon-blue text-text-primary rounded-lg px-4 py-3
            focus:border-neon-cyan focus:outline-none focus:ring-2 focus:ring-neon-cyan/50 transition-all;
+  }
+
+  /* Badge styles */
+  .badge-published {
+    @apply inline-block px-3 py-1 bg-success/20 text-success border border-success rounded-full text-xs font-semibold uppercase;
+  }
+
+  .badge-draft {
+    @apply inline-block px-3 py-1 bg-warning/20 text-warning border border-warning rounded-full text-xs font-semibold uppercase;
+  }
+
+  .badge-dev {
+    @apply inline-block px-3 py-1 bg-neon-cyan/20 text-neon-cyan border border-neon-cyan rounded-full text-xs font-semibold uppercase;
+  }
+
+  .badge-stage {
+    @apply inline-block px-3 py-1 bg-neon-orange/20 text-neon-orange border border-neon-orange rounded-full text-xs font-semibold uppercase;
+  }
+
+  .badge-prod {
+    @apply inline-block px-3 py-1 bg-success/20 text-success border border-success rounded-full text-xs font-semibold uppercase;
   }
 
   /* Card styles */
