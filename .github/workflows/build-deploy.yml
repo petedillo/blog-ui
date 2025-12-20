@@ -82,9 +82,11 @@ jobs:
         run: |
           if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
             echo "tag=main-latest" >> $GITHUB_OUTPUT
+            echo "extra_tag=prod-latest" >> $GITHUB_OUTPUT
             echo "env=prod" >> $GITHUB_OUTPUT
           else
             echo "tag=develop-latest" >> $GITHUB_OUTPUT
+            echo "extra_tag=dev-latest" >> $GITHUB_OUTPUT
             echo "env=dev" >> $GITHUB_OUTPUT
           fi
 
@@ -102,6 +104,7 @@ jobs:
           push: true
           tags: |
             ${{ env.NEXUS_REGISTRY }}/blog-ui:${{ steps.docker-tag.outputs.tag }}
+            ${{ env.NEXUS_REGISTRY }}/blog-ui:${{ steps.docker-tag.outputs.extra_tag }}
             ${{ env.NEXUS_REGISTRY }}/blog-ui:${{ github.sha }}
 
       - name: Summary
@@ -109,7 +112,7 @@ jobs:
           echo "### Deployment Summary :rocket:" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "- **Environment**: ${{ steps.docker-tag.outputs.env }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Docker Image**: \`blog-ui:${{ steps.docker-tag.outputs.tag }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Docker Images**: \`blog-ui:${{ steps.docker-tag.outputs.tag }}\`, \`blog-ui:${{ steps.docker-tag.outputs.extra_tag }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- **Commit SHA**: \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- **Registry**: ${{ env.NEXUS_REGISTRY }}" >> $GITHUB_STEP_SUMMARY
           echo "- **GitOps**: ArgoCD Image Updater will detect and update blog-gitops" >> $GITHUB_STEP_SUMMARY
