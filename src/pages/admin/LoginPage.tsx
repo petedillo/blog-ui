@@ -3,26 +3,34 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 
+interface LoginFormState {
+  username: string;
+  password: string;
+  loading: boolean;
+}
+
 export default function LoginPage() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [formState, setFormState] = useState<LoginFormState>({
+    username: '',
+    password: '',
+    loading: false,
+  });
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setFormState(prev => ({ ...prev, loading: true }));
 
     try {
-      await login(username, password);
+      await login(formState.username, formState.password);
       toast.success('Login successful!');
       navigate('/admin/posts');
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Login failed';
       toast.error(message);
     } finally {
-      setLoading(false);
+      setFormState(prev => ({ ...prev, loading: false }));
     }
   };
 
@@ -43,11 +51,11 @@ export default function LoginPage() {
             <input
               id="username"
               type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={formState.username}
+              onChange={(e) => setFormState(prev => ({ ...prev, username: e.target.value }))}
               className="input-neon w-full"
               placeholder="Enter username"
-              disabled={loading}
+              disabled={formState.loading}
             />
           </div>
 
@@ -58,20 +66,20 @@ export default function LoginPage() {
             <input
               id="password"
               type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              value={formState.password}
+              onChange={(e) => setFormState(prev => ({ ...prev, password: e.target.value }))}
               className="input-neon w-full"
               placeholder="Enter password"
-              disabled={loading}
+              disabled={formState.loading}
             />
           </div>
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={formState.loading}
             className="w-full py-3 bg-gradient-to-r from-neon-cyan to-neon-blue text-dark-bg font-bold rounded-lg hover:shadow-neon-glow-cyan transition-all disabled:opacity-50"
           >
-            {loading ? 'Signing in...' : 'Sign In'}
+            {formState.loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
 

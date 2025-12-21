@@ -10,6 +10,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const refreshTimerRef = { current: null as ReturnType<typeof setTimeout> | null };
 
   const checkAuth = async () => {
+    // Only check auth if we have stored tokens
+    const hasTokens = authService.getStoredTokens();
+    if (!hasTokens) {
+      setLoading(false);
+      return;
+    }
+
     try {
       const userData = await authService.getCurrentUser();
       setUser(userData);

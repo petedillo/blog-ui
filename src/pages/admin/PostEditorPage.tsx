@@ -2,30 +2,53 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { adminService } from '../../services/adminService';
+import { MediaUpload } from '../../components/admin/MediaUpload';
+import { MediaGallery } from '../../components/admin/MediaGallery';
+import api from '../../services/api';
+
+interface PostFormState {
+  title: string;
+  slug: string;
+  content: string;
+  status: 'DRAFT' | 'PUBLISHED';
+  tags: string[];
+}
+
+interface UIState {
+  loading: boolean;
+  saving: boolean;
+}
 
 export default function PostEditorPage() {
   const { id } = useParams<{ id?: string }>();
   const navigate = useNavigate();
   const isEditing = !!id;
 
-  const [title, setTitle] = useState('');
-  const [slug, setSlug] = useState('');
-  const [content, setContent] = useState('');
-  const [status, setStatus] = useState<'DRAFT' | 'PUBLISHED'>('DRAFT');
-  const [tags, setTags] = useState<string[]>([]);
+  const [formData, setFormData] = useState<PostFormState>({
+    title: '',
+    slug: '',
+    content: '',
+    status: 'DRAFT',
+    tags: [],
+  });
+
+  const [uiState, setUIState] = useState<UIState>({
+    loading: isEditing,
+    saving: false,
+  });
+
   const [tagInput, setTagInput] = useState('');
-  const [loading, setLoading] = useState(isEditing);
-  const [saving, setSaving] = useState(false);
+  const [media, setMedia] = useState<any[]>([]);
 
   useEffect(() => {
     // Auto-generate slug from title
-    const newSlug = title
+    const newSlug = formData.title
       .toLowerCase()
       .trim()
       .replace(/\s+/g, '-')
       .replace(/[^\w-]/g, '');
-    setSlug(newSlug);
-  }, [title]);
+    setFormData(prev => ({ ...prev, slug: newSlug }));
+  }, [formData.title]);
 
   useEffect(() => {
     if (isEditing && id) {
@@ -36,16 +59,29 @@ export default function PostEditorPage() {
   const loadPost = async () => {
     try {
       const post = await adminService.getPostById(id as string);
-      setTitle(post.title);
-      setSlug(post.slug);
-      setContent(post.content);
-      setStatus(post.status);
-      setTags(post.tags || []);
+      setFormData({
+        title: post.title,
+        slug: post.slug,
+        content: post.content,
+        status: post.status,
+        tags: post.tags || [],
+      });
+      await loadMedia();
     } catch (error) {
       toast.error('Failed to load post');
       navigate('/admin/posts');
     } finally {
-      setLoading(false);
+      setUIState(prev => ({ ...prev, loading: false }));
+    }
+  };
+
+  const loadMedia = async () => {
+    if (!id) return;
+    try {
+      const response = await api.get(`/admin/media/posts/${id}`);
+      setMedia(response.data);
+    } catch (error) {
+      console.error('Failed to load media:', error);
     }
   };
 
@@ -53,49 +89,47 @@ export default function PostEditorPage() {
     if (e.key === 'Enter') {
       e.preventDefault();
       const trimmed = tagInput.trim();
-      if (trimmed && !tags.includes(trimmed)) {
-        setTags([...tags, trimmed]);
+      if (trimmed && !formData.tags.includes(trimmed)) {
+        setFormData(prev => ({ ...prev, tags: [...prev.tags, trimmed] }));
         setTagInput('');
       }
     }
   };
 
   const handleRemoveTag = (tag: string) => {
-    setTags(tags.filter(t => t !== tag));
+    setFormData(prev => ({ ...prev, tags: prev.tags.filter(t => t !== tag) }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!title.trim()) {
+
+    if (!formData.title.trim()) {
       toast.error('Title is required');
       return;
     }
-    
-    if (!content.trim()) {
+
+    if (!formData.content.trim()) {
       toast.error('Content is required');
       return;
     }
 
-    setSaving(true);
+    setUIState(prev => ({ ...prev, saving: true }));
 
     try {
-      const postData = { title, slug, content, status, tags };
-      
       if (isEditing && id) {
-        await adminService.updatePost(id, postData);
+        await adminService.updatePost(id, formData);
         toast.success('Post updated successfully!');
       } else {
-        await adminService.createPost(postData);
+        await adminService.createPost(formData);
         toast.success('Post created successfully!');
       }
-      
+
       navigate('/admin/posts');
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Operation failed';
       toast.error(`Failed to ${isEditing ? 'update' : 'create'} post: ${message}`);
     } finally {
-      setSaving(false);
+      setUIState(prev => ({ ...prev, saving: false }));
     }
   };
 
@@ -106,7 +140,7 @@ export default function PostEditorPage() {
           {isEditing ? 'Edit Post' : 'New Post'}
         </h1>
 
-        {loading ? (
+        {uiState.loading ? (
           <div className="flex justify-center items-center min-h-96">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-neon-cyan"></div>
           </div>
@@ -118,11 +152,11 @@ export default function PostEditorPage() {
               </label>
               <input
                 type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                value={formData.title}
+                onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
                 className="input-neon w-full"
                 placeholder="Post title"
-                disabled={saving}
+                disabled={uiState.saving}
               />
             </div>
 
@@ -132,11 +166,11 @@ export default function PostEditorPage() {
               </label>
               <input
                 type="text"
-                value={slug}
-                onChange={(e) => setSlug(e.target.value)}
+                value={formData.slug}
+                onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value }))}
                 className="input-neon w-full"
                 placeholder="auto-generated"
-                disabled={saving}
+                disabled={uiState.saving}
               />
             </div>
 
@@ -145,11 +179,11 @@ export default function PostEditorPage() {
                 Content
               </label>
               <textarea
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
+                value={formData.content}
+                onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
                 className="input-neon w-full min-h-96 font-mono text-sm"
                 placeholder="Markdown content"
-                disabled={saving}
+                disabled={uiState.saving}
               />
             </div>
 
@@ -164,10 +198,10 @@ export default function PostEditorPage() {
                 onKeyDown={handleAddTag}
                 className="input-neon w-full mb-2"
                 placeholder="Add tags (press Enter)"
-                disabled={saving}
+                disabled={uiState.saving}
               />
               <div className="flex flex-wrap gap-2">
-                {tags.map(tag => (
+                {formData.tags.map(tag => (
                   <div
                     key={tag}
                     className="tag-neon text-sm flex items-center gap-2"
@@ -177,7 +211,7 @@ export default function PostEditorPage() {
                       type="button"
                       onClick={() => handleRemoveTag(tag)}
                       className="ml-1 hover:text-neon-cyan"
-                      disabled={saving}
+                      disabled={uiState.saving}
                     >
                       ×
                     </button>
@@ -191,29 +225,48 @@ export default function PostEditorPage() {
                 Status
               </label>
               <select
-                value={status}
-                onChange={(e) => setStatus(e.target.value as 'DRAFT' | 'PUBLISHED')}
+                value={formData.status}
+                onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value as 'DRAFT' | 'PUBLISHED' }))}
                 className="input-neon w-full"
-                disabled={saving}
+                disabled={uiState.saving}
               >
                 <option value="DRAFT">Draft</option>
                 <option value="PUBLISHED">Published</option>
               </select>
             </div>
 
+            {isEditing && id && (
+              <div className="border-t border-neon-blue/30 pt-6">
+                <h2 className="text-xl font-bold text-neon-cyan mb-4">Media</h2>
+
+                <div className="mb-6">
+                  <MediaUpload postId={parseInt(id)} onUploadComplete={loadMedia} />
+                </div>
+
+                {media.length > 0 && (
+                  <div>
+                    <p className="text-text-secondary text-sm mb-4">
+                      Drag to reorder • First image is the cover
+                    </p>
+                    <MediaGallery media={media} postId={parseInt(id)} onUpdate={loadMedia} />
+                  </div>
+                )}
+              </div>
+            )}
+
             <div className="flex gap-4">
               <button
                 type="submit"
-                disabled={saving}
+                disabled={uiState.saving}
                 className="px-6 py-3 bg-gradient-to-r from-neon-cyan to-neon-blue text-dark-bg font-bold rounded-lg hover:shadow-neon-glow-cyan transition-all disabled:opacity-50"
               >
-                {saving ? 'Saving...' : 'Save Post'}
+                {uiState.saving ? 'Saving...' : 'Save Post'}
               </button>
               <button
                 type="button"
                 onClick={() => navigate('/admin/posts')}
                 className="px-6 py-3 border border-neon-blue text-neon-blue rounded-lg hover:border-neon-cyan transition-all"
-                disabled={saving}
+                disabled={uiState.saving}
               >
                 Cancel
               </button>
