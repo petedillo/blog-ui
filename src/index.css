@@ -6,8 +6,10 @@
   body {
     @apply bg-dark-bg text-neon-cyan font-sans antialiased;
     background-image:
-      radial-gradient(circle at 20% 50%, rgba(0, 255, 255, 0.05) 0%, transparent 50%),
-      radial-gradient(circle at 80% 80%, rgba(0, 255, 127, 0.05) 0%, transparent 50%);
+      radial-gradient(circle at 20% 50%, rgba(255, 0, 85, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(255, 140, 0, 0.06) 0%, transparent 50%),
+      radial-gradient(circle at 50% 80%, rgba(0, 255, 255, 0.05) 0%, transparent 50%),
+      radial-gradient(circle at 10% 90%, rgba(0, 255, 127, 0.05) 0%, transparent 50%);
     margin: 0;
     display: flex;
     flex-direction: column;
@@ -19,11 +21,15 @@
   }
 
   a {
-    @apply text-neon-blue hover:text-neon-cyan transition-colors duration-200;
+    @apply text-neon-blue hover:text-neon-pink transition-colors duration-200;
   }
 
   ::selection {
-    @apply bg-neon-cyan text-dark-bg;
+    @apply bg-neon-pink text-dark-bg;
+  }
+
+  ::-moz-selection {
+    @apply bg-neon-pink text-dark-bg;
   }
 }
 
@@ -51,6 +57,16 @@
            hover:border-neon-cyan hover:text-neon-cyan transition-all duration-300;
   }
 
+  .tag-neon-success {
+    @apply inline-block px-3 py-1 bg-neon-green/10 text-neon-green border border-neon-green rounded-full
+           hover:bg-neon-green/20 transition-all duration-300;
+  }
+
+  .tag-neon-warning {
+    @apply inline-block px-3 py-1 bg-neon-orange/10 text-neon-orange border border-neon-orange rounded-full
+           hover:bg-neon-orange/20 transition-all duration-300;
+  }
+
   /* Link styles */
   .link-neon {
     @apply text-neon-blue hover:text-neon-cyan transition-all duration-200;
@@ -71,20 +87,53 @@
 
   /* Button styles */
   .btn-primary {
-    @apply px-6 py-3 bg-neon-green text-dark-bg font-bold rounded-lg
-           hover:bg-neon-cyan hover:text-dark-bg hover:shadow-lg hover:shadow-neon-cyan/50
-           transition-all duration-300 transform hover:scale-105;
+      @apply px-6 py-3 bg-neon-green text-dark-bg font-bold rounded-lg
+        hover:bg-neon-cyan hover:text-dark-bg hover:shadow-neon-cyan
+        transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-neon-green/50;
   }
 
   .btn-secondary {
     @apply px-6 py-3 border-2 border-neon-cyan text-neon-cyan font-medium rounded-lg
-           hover:bg-neon-cyan hover:text-dark-bg transition-all duration-300;
+           hover:bg-neon-cyan hover:text-dark-bg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-neon-cyan/40;
+  }
+
+  /* CTA gradient button (pink → orange) */
+  .btn-cta {
+    @apply px-6 py-3 bg-gradient-to-r from-neon-pink to-neon-orange text-dark-bg font-bold rounded-lg
+           hover:shadow-neon-glow-pink transition-all duration-300 transform hover:scale-105
+           focus:outline-none focus:ring-2 focus:ring-neon-pink/50;
   }
 
   /* Input styles */
   .input-neon {
-    @apply bg-dark-bg border-2 border-neon-blue text-neon-cyan rounded-lg px-4 py-3
+    @apply bg-dark-bg border-2 border-neon-blue text-text-primary rounded-lg px-4 py-3
            focus:border-neon-cyan focus:outline-none focus:ring-2 focus:ring-neon-cyan/50 transition-all;
+  }
+
+  /* Spinner */
+  .spinner-neon {
+    @apply animate-spin rounded-full border-t-2 border-neon-cyan;
+  }
+
+  /* Badge styles */
+  .badge-published {
+    @apply inline-block px-3 py-1 bg-success/20 text-success border border-success rounded-full text-xs font-semibold uppercase;
+  }
+
+  .badge-draft {
+    @apply inline-block px-3 py-1 bg-warning/20 text-warning border border-warning rounded-full text-xs font-semibold uppercase;
+  }
+
+  .badge-dev {
+    @apply inline-block px-3 py-1 bg-neon-cyan/20 text-neon-cyan border border-neon-cyan rounded-full text-xs font-semibold uppercase;
+  }
+
+  .badge-stage {
+    @apply inline-block px-3 py-1 bg-neon-orange/20 text-neon-orange border border-neon-orange rounded-full text-xs font-semibold uppercase;
+  }
+
+  .badge-prod {
+    @apply inline-block px-3 py-1 bg-success/20 text-success border border-success rounded-full text-xs font-semibold uppercase;
   }
 
   /* Card styles */
@@ -93,9 +142,33 @@
            hover:border-neon-cyan hover:shadow-lg hover:shadow-neon-cyan/20 transition-all duration-300;
   }
 
+  .card-neon-accent {
+    @apply bg-surface-dark border-2 border-neon-blue/30 rounded-lg p-6
+           hover:border-neon-cyan hover:shadow-neon-cyan transition-all duration-300;
+  }
+
   /* Text glow effect */
   .text-glow {
     @apply drop-shadow-[0_0_8px_rgba(0,255,255,0.5)];
+  }
+
+  .text-glow-pink {
+    @apply drop-shadow-[0_0_8px_rgba(255,0,85,0.5)];
+  }
+
+  .text-glow-orange {
+    @apply drop-shadow-[0_0_8px_rgba(255,140,0,0.5)];
+  }
+
+  /* Accent tag styles with pink/orange */
+  .tag-accent-pink {
+    @apply inline-block px-3 py-1 bg-dark-bg border border-neon-pink text-neon-pink rounded-full
+           hover:border-neon-pink hover:bg-neon-pink/10 hover:shadow-neon-pink transition-all duration-300;
+  }
+
+  .tag-accent-orange {
+    @apply inline-block px-3 py-1 bg-dark-bg border border-neon-orange text-neon-orange rounded-full
+           hover:border-neon-orange hover:bg-neon-orange/10 hover:shadow-neon-orange transition-all duration-300;
   }
 }
 
