@@ -22,6 +22,10 @@ export interface BlogPost {
   createdAt: string;
   updatedAt: string;
   publishedAt: string;
+  coverImage?: {
+    url: string;
+    altText: string;
+  };
 }
 
 export interface Media {

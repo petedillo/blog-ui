@@ -57,6 +57,16 @@
            hover:border-neon-cyan hover:text-neon-cyan transition-all duration-300;
   }
 
+  .tag-neon-success {
+    @apply inline-block px-3 py-1 bg-neon-green/10 text-neon-green border border-neon-green rounded-full
+           hover:bg-neon-green/20 transition-all duration-300;
+  }
+
+  .tag-neon-warning {
+    @apply inline-block px-3 py-1 bg-neon-orange/10 text-neon-orange border border-neon-orange rounded-full
+           hover:bg-neon-orange/20 transition-all duration-300;
+  }
+
   /* Link styles */
   .link-neon {
     @apply text-neon-blue hover:text-neon-cyan transition-all duration-200;
@@ -77,20 +87,32 @@
 
   /* Button styles */
   .btn-primary {
-    @apply px-6 py-3 bg-neon-green text-dark-bg font-bold rounded-lg
-           hover:bg-neon-cyan hover:text-dark-bg hover:shadow-lg hover:shadow-neon-cyan/50
-           transition-all duration-300 transform hover:scale-105;
+      @apply px-6 py-3 bg-neon-green text-dark-bg font-bold rounded-lg
+        hover:bg-neon-cyan hover:text-dark-bg hover:shadow-neon-cyan
+        transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-neon-green/50;
   }
 
   .btn-secondary {
     @apply px-6 py-3 border-2 border-neon-cyan text-neon-cyan font-medium rounded-lg
-           hover:bg-neon-cyan hover:text-dark-bg transition-all duration-300;
+           hover:bg-neon-cyan hover:text-dark-bg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-neon-cyan/40;
+  }
+
+  /* CTA gradient button (pink → orange) */
+  .btn-cta {
+    @apply px-6 py-3 bg-gradient-to-r from-neon-pink to-neon-orange text-dark-bg font-bold rounded-lg
+           hover:shadow-neon-glow-pink transition-all duration-300 transform hover:scale-105
+           focus:outline-none focus:ring-2 focus:ring-neon-pink/50;
   }
 
   /* Input styles */
   .input-neon {
     @apply bg-dark-bg border-2 border-neon-blue text-text-primary rounded-lg px-4 py-3
            focus:border-neon-cyan focus:outline-none focus:ring-2 focus:ring-neon-cyan/50 transition-all;
+  }
+
+  /* Spinner */
+  .spinner-neon {
+    @apply animate-spin rounded-full border-t-2 border-neon-cyan;
   }
 
   /* Badge styles */
@@ -118,6 +140,11 @@
   .card-neon {
     @apply bg-dark-bg border-2 border-neon-cyan/30 rounded-lg p-6
            hover:border-neon-cyan hover:shadow-lg hover:shadow-neon-cyan/20 transition-all duration-300;
+  }
+
+  .card-neon-accent {
+    @apply bg-surface-dark border-2 border-neon-blue/30 rounded-lg p-6
+           hover:border-neon-cyan hover:shadow-neon-cyan transition-all duration-300;
   }
 
   /* Text glow effect */

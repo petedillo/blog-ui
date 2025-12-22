@@ -22,7 +22,7 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
-    const originalRequest = error.config as any;
+    const originalRequest = error.config as AxiosError['config'] & { _retry?: boolean };
 
     // Check if this is a 401 and we haven't already retried this request
     if (error.response?.status === 401 && !originalRequest._retry) {

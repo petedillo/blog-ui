@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useBlogPost } from '../hooks/useBlogPost';
 import Container from '../components/layout/Container';
@@ -7,6 +7,10 @@ import ErrorMessage from '../components/common/ErrorMessage';
 import { formatDate } from '../utils/dateFormatter';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import rehypeSlug from 'rehype-slug';
+import rehypeAutolinkHeadings from 'rehype-autolink-headings';
+import rehypeHighlight from 'rehype-highlight';
+import 'highlight.js/styles/atom-one-dark.css';
 import {
   NeonTable,
   NeonTableHead,
@@ -20,6 +24,23 @@ const BlogPostPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const { post, loading, error } = useBlogPost(slug);
 
+  const contentRef = useRef<HTMLDivElement | null>(null);
+  const [toc, setToc] = useState<Array<{ id: string; text: string; level: number }>>([]);
+
+  useEffect(() => {
+    if (!contentRef.current) return;
+    // Keep TOC simple: only include H2 headings
+    const nodes = contentRef.current.querySelectorAll('h2[id]');
+    const items: Array<{ id: string; text: string; level: number }> = [];
+    nodes.forEach((el) => {
+      const id = el.getAttribute('id') || '';
+      const text = el.textContent || '';
+      const level = 2;
+      if (id && text) items.push({ id, text, level });
+    });
+    setToc(items);
+  }, [post?.content]);
+
   if (loading) {
     return <Spinner />;
   }
@@ -29,8 +50,9 @@ const BlogPostPage: React.FC = () => {
   }
 
   return (
-    <Container className="py-12 max-w-4xl mx-auto">
-      <article>
+    <Container className="py-12 max-w-6xl mx-auto">
+      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_260px] gap-8">
+        <article>
         <header className="mb-8">
           <h1 className="heading-neon-primary mb-4">
             {post.title}
@@ -56,22 +78,67 @@ const BlogPostPage: React.FC = () => {
         </header>
         
         {/* Content */}
-        <div className="prose prose-invert lg:prose-xl max-w-none prose-headings:text-neon-green prose-p:text-neon-cyan prose-a:text-neon-blue prose-strong:text-neon-green prose-code:text-neon-cyan prose-pre:bg-overlay prose-pre:border prose-pre:border-neon-cyan/30 prose-li:text-neon-cyan prose-blockquote:text-neon-blue prose-blockquote:border-neon-cyan">
-          <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
-            components={{
-              table: NeonTable,
-              thead: NeonTableHead,
-              tbody: NeonTableBody,
-              tr: NeonTableRow,
-              th: NeonTableHeader,
-              td: NeonTableCell,
-            }}
+          <div
+            ref={contentRef}
+            className="prose prose-invert lg:prose-xl max-w-none prose-headings:text-neon-green prose-headings:scroll-mt-24 prose-p:text-neon-cyan prose-a:text-neon-blue prose-strong:text-neon-green prose-code:text-neon-cyan prose-pre:bg-overlay prose-pre:border prose-pre:border-neon-cyan/30 prose-li:text-neon-cyan prose-blockquote:text-neon-blue prose-blockquote:border-neon-cyan"
           >
-            {post.content}
-          </ReactMarkdown>
-        </div>
-      </article>
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              rehypePlugins={[
+                rehypeSlug,
+                [
+                  rehypeAutolinkHeadings,
+                  {
+                    behavior: 'append',
+                    properties: { className: ['link-neon'] },
+                  },
+                ],
+                rehypeHighlight,
+              ]}
+              components={{
+                table: NeonTable,
+                thead: NeonTableHead,
+                tbody: NeonTableBody,
+                tr: NeonTableRow,
+                th: NeonTableHeader,
+                td: NeonTableCell,
+              }}
+            >
+              {post.content}
+            </ReactMarkdown>
+          </div>
+        </article>
+
+        {/* Simple TOC (desktop) */}
+        {toc.length > 0 && (
+          <aside className="hidden xl:block">
+            <div className="sticky top-24 border-l border-neon-cyan/30 pl-4 text-sm">
+              <div className="text-lg font-bold text-neon-cyan mb-4">On this page</div>
+              <nav>
+                <ul className="space-y-2">
+                  {toc.map((item) => (
+                    <li key={item.id} className={item.level === 3 ? 'ml-3' : ''}>
+                      <a
+                        href={`#${item.id}`}
+                        className="link-neon"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          const el = document.getElementById(item.id);
+                          if (el) {
+                            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                          }
+                        }}
+                      >
+                        {item.text}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            </div>
+          </aside>
+        )}
+      </div>
     </Container>
   );
 };
