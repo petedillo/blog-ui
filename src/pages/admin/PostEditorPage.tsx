@@ -19,6 +19,14 @@ interface UIState {
   saving: boolean;
 }
 
+interface PostMediaItem {
+  id: number;
+  url: string;
+  altText: string;
+  caption?: string;
+  displayOrder: number;
+}
+
 export default function PostEditorPage() {
   const { id } = useParams<{ id?: string }>();
   const navigate = useNavigate();
@@ -38,7 +46,7 @@ export default function PostEditorPage() {
   });
 
   const [tagInput, setTagInput] = useState('');
-  const [media, setMedia] = useState<any[]>([]);
+  const [media, setMedia] = useState<PostMediaItem[]>([]);
 
   useEffect(() => {
     // Auto-generate slug from title
@@ -54,6 +62,7 @@ export default function PostEditorPage() {
     if (isEditing && id) {
       loadPost();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, isEditing]);
 
   const loadPost = async () => {
@@ -67,7 +76,7 @@ export default function PostEditorPage() {
         tags: post.tags || [],
       });
       await loadMedia();
-    } catch (error) {
+    } catch {
       toast.error('Failed to load post');
       navigate('/admin/posts');
     } finally {
@@ -78,7 +87,7 @@ export default function PostEditorPage() {
   const loadMedia = async () => {
     if (!id) return;
     try {
-      const response = await api.get(`/admin/media/posts/${id}`);
+      const response = await api.get<PostMediaItem[]>(`/admin/media/posts/${id}`);
       setMedia(response.data);
     } catch (error) {
       console.error('Failed to load media:', error);
@@ -125,9 +134,10 @@ export default function PostEditorPage() {
       }
 
       navigate('/admin/posts');
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Operation failed';
-      toast.error(`Failed to ${isEditing ? 'update' : 'create'} post: ${message}`);
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { status?: number; data?: { message?: string } }; message?: string };
+      const message = axiosError.response?.data?.message || axiosError.message || 'Operation failed';
+      toast.error(`Failed to ${isEditing ? 'update' : 'create'} post: ${axiosError.response?.status} - ${message}`);
     } finally {
       setUIState(prev => ({ ...prev, saving: false }));
     }
@@ -136,13 +146,13 @@ export default function PostEditorPage() {
   return (
     <div className="min-h-screen bg-dark-bg p-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-neon-cyan mb-8">
+        <h1 className="text-3xl font-bold text-neon-green mb-8">
           {isEditing ? 'Edit Post' : 'New Post'}
         </h1>
 
         {uiState.loading ? (
           <div className="flex justify-center items-center min-h-96">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-neon-cyan"></div>
+            <div className="spinner-neon h-12 w-12"></div>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -237,7 +247,7 @@ export default function PostEditorPage() {
 
             {isEditing && id && (
               <div className="border-t border-neon-blue/30 pt-6">
-                <h2 className="text-xl font-bold text-neon-cyan mb-4">Media</h2>
+                <h2 className="text-xl font-bold text-neon-green mb-4">Media</h2>
 
                 <div className="mb-6">
                   <MediaUpload postId={parseInt(id)} onUploadComplete={loadMedia} />
@@ -258,14 +268,14 @@ export default function PostEditorPage() {
               <button
                 type="submit"
                 disabled={uiState.saving}
-                className="px-6 py-3 bg-gradient-to-r from-neon-cyan to-neon-blue text-dark-bg font-bold rounded-lg hover:shadow-neon-glow-cyan transition-all disabled:opacity-50"
+                className="btn-cta disabled:opacity-50"
               >
                 {uiState.saving ? 'Saving...' : 'Save Post'}
               </button>
               <button
                 type="button"
                 onClick={() => navigate('/admin/posts')}
-                className="px-6 py-3 border border-neon-blue text-neon-blue rounded-lg hover:border-neon-cyan transition-all"
+                className="btn-secondary"
                 disabled={uiState.saving}
               >
                 Cancel

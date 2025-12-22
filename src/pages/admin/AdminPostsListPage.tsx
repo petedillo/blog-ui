@@ -48,10 +48,10 @@ export default function AdminPostsListPage() {
       setPostsState(prev => ({
         ...prev,
         posts: _pageNum === 0 ? response.content : [...prev.posts, ...response.content],
-        hasMore: !response.last,
+        hasMore: response.hasMore,
         loading: false,
       }));
-    } catch (error) {
+    } catch {
       toast.error('Failed to load posts');
       setPostsState(prev => ({ ...prev, loading: false }));
     }
@@ -63,11 +63,11 @@ export default function AdminPostsListPage() {
   }, [filters.search, filters.statusFilter, loadPosts]);
 
   useEffect(() => {
-    if (!postsState.hasMore) return;
+    if (!postsState.hasMore || postsState.loading) return;
 
     const observer = new IntersectionObserver(
       entries => {
-        if (entries[0].isIntersecting && !postsState.loading) {
+        if (entries[0].isIntersecting && !postsState.loading && postsState.hasMore) {
           setPostsState(prev => {
             const nextPage = prev.page + 1;
             loadPosts(nextPage);
@@ -88,7 +88,7 @@ export default function AdminPostsListPage() {
         observer.unobserve(currentTarget);
       }
     };
-  }, [postsState.loading, postsState.hasMore, loadPosts]);
+  }, [postsState.loading, postsState.hasMore, postsState.page, loadPosts]);
 
   const handleDelete = async (id: number) => {
     if (confirm('Are you sure you want to delete this post?')) {
@@ -96,8 +96,9 @@ export default function AdminPostsListPage() {
         await adminService.deletePost(id);
         setPostsState(prev => ({ ...prev, posts: prev.posts.filter(p => p.id !== id) }));
         toast.success('Post deleted');
-      } catch (error) {
-        toast.error('Failed to delete post');
+      } catch (error: unknown) {
+        const axiosError = error as { response?: { status?: number } };
+        toast.error(`Failed to delete post: ${axiosError.response?.status || 'Unknown error'}`);
       }
     }
   };
@@ -106,10 +107,10 @@ export default function AdminPostsListPage() {
     <div className="min-h-screen bg-dark-bg p-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-neon-cyan">Posts</h1>
+          <h1 className="text-3xl font-bold text-neon-green">Posts</h1>
           <button
             onClick={() => navigate('/admin/posts/new')}
-            className="px-6 py-2 bg-gradient-to-r from-neon-cyan to-neon-blue text-dark-bg font-bold rounded-lg hover:shadow-neon-glow-cyan transition-all"
+            className="px-6 py-2 bg-gradient-to-r from-neon-pink to-neon-orange text-dark-bg font-bold rounded-lg hover:shadow-neon-glow-pink focus:outline-none focus:ring-2 focus:ring-neon-pink/50 transition-all"
           >
             New Post
           </button>
@@ -131,7 +132,13 @@ export default function AdminPostsListPage() {
                 onClick={() => setFilters(prev => ({ ...prev, statusFilter: status }))}
                 className={`px-4 py-2 rounded-lg transition-all ${
                   filters.statusFilter === status
-                    ? 'bg-neon-cyan text-dark-bg'
+                    ? (
+                        status === 'ALL'
+                          ? 'bg-neon-cyan text-dark-bg'
+                          : status === 'DRAFT'
+                            ? 'bg-neon-orange text-dark-bg'
+                            : 'bg-neon-green text-dark-bg'
+                      )
                     : 'border border-neon-blue text-neon-blue hover:border-neon-cyan'
                 }`}
               >
@@ -171,13 +178,13 @@ export default function AdminPostsListPage() {
                       </span>
                       <button
                         onClick={() => navigate(`/admin/posts/${post.id}/edit`)}
-                        className="text-neon-cyan hover:text-neon-blue transition-colors"
+                        className="text-neon-blue hover:text-neon-cyan transition-colors"
                       >
                         Edit
                       </button>
                       <button
                         onClick={() => handleDelete(post.id)}
-                        className="text-error hover:text-red-400 transition-colors"
+                        className="text-neon-pink hover:text-neon-orange transition-colors"
                       >
                         Delete
                       </button>
