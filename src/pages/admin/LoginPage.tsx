@@ -40,7 +40,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-dark-bg flex items-center justify-center px-4">
       <div className="w-full max-w-md bg-surface-dark border-2 border-neon-cyan rounded-lg p-8">
-        <h1 className="text-3xl font-bold text-neon-cyan mb-2 text-center">Admin</h1>
+        <h1 className="text-3xl font-bold text-neon-green mb-2 text-center">Admin</h1>
         <p className="text-text-secondary text-center mb-8">Enter your credentials</p>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -77,7 +77,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={formState.loading}
-            className="w-full py-3 bg-gradient-to-r from-neon-cyan to-neon-blue text-dark-bg font-bold rounded-lg hover:shadow-neon-glow-cyan transition-all disabled:opacity-50"
+            className="btn-cta w-full disabled:opacity-50"
           >
             {formState.loading ? 'Signing in...' : 'Sign In'}
           </button>
@@ -87,7 +87,7 @@ export default function LoginPage() {
           <>
             <div className="relative my-6">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-neon-blue/30"></div>
+                <div className="w-full border-t border-neon-cyan/30"></div>
               </div>
               <div className="relative flex justify-center text-sm">
                 <span className="px-2 bg-surface-dark text-text-secondary">Or continue with</span>

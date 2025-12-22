@@ -50,21 +50,24 @@ function SortableMediaItem({ media, onDelete }: { media: Media; onDelete: (id: n
       ref={setNodeRef}
       style={style}
       {...attributes}
-      {...listeners}
-      className="relative border border-neon-blue rounded-lg p-2 bg-surface-dark hover:border-neon-cyan transition-colors cursor-move group"
+      className="relative border border-neon-blue rounded-lg p-2 bg-surface-dark hover:border-neon-cyan transition-colors group"
     >
-      <img
-        src={media.url}
-        alt={media.altText}
-        className="w-full h-32 object-cover rounded"
-        draggable={false}
-      />
+      <div {...listeners} className="cursor-move">
+        <img
+          src={media.url}
+          alt={media.altText}
+          className="w-full h-32 object-cover rounded"
+          draggable={false}
+        />
+      </div>
       <button
+        type="button"
         onClick={(e) => {
+          e.preventDefault();
           e.stopPropagation();
           onDelete(media.id);
         }}
-        className="absolute top-3 right-3 bg-error/90 hover:bg-error text-white rounded p-1.5 opacity-0 group-hover:opacity-100 transition-opacity"
+        className="absolute top-3 right-3 bg-neon-pink/90 hover:bg-neon-pink text-dark-bg rounded p-1.5 opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:shadow-neon-pink"
         title="Delete"
       >
         <Trash2 className="w-4 h-4" />
@@ -101,7 +104,7 @@ export function MediaGallery({ media, postId, onUpdate }: Props) {
         await api.put(`/admin/media/posts/${postId}/reorder`, mediaIds);
         toast.success('Media reordered');
         onUpdate();
-      } catch (error) {
+      } catch {
         toast.error('Failed to reorder media');
         setItems(items); // Revert on error
       }
@@ -116,8 +119,9 @@ export function MediaGallery({ media, postId, onUpdate }: Props) {
       setItems((prev) => prev.filter((m) => m.id !== id));
       toast.success('Media deleted');
       onUpdate();
-    } catch (error) {
-      toast.error('Failed to delete media');
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { status?: number } };
+      toast.error(`Failed to delete media: ${axiosError.response?.status || 'Unknown error'}`);
     }
   };
 

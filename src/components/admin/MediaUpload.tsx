@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import toast from 'react-hot-toast';
+import api from '../../services/api';
 
 interface Props {
   postId: number;
@@ -15,21 +16,17 @@ export function MediaUpload({ postId, onUploadComplete }: Props) {
       formData.append('postId', String(postId));
 
       try {
-        const response = await fetch('/api/v1/admin/media/upload', {
-          method: 'POST',
-          body: formData,
-          credentials: 'include',
+        await api.post('/admin/media/upload', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
         });
-
-        if (!response.ok) {
-          throw new Error('Upload failed');
-        }
 
         toast.success(`Uploaded ${acceptedFiles.length} file(s)`);
         onUploadComplete();
-      } catch (error) {
-        toast.error('Upload failed');
-        console.error('Upload error:', error);
+      } catch (error: unknown) {
+        const axiosError = error as { response?: { status?: number } };
+        toast.error(`Upload failed: ${axiosError.response?.status || 'Unknown error'}`);
       }
     },
     [postId, onUploadComplete]
@@ -45,7 +42,7 @@ export function MediaUpload({ postId, onUploadComplete }: Props) {
     <div
       {...getRootProps()}
       className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition
-        ${isDragActive ? 'border-neon-cyan bg-neon-cyan/10' : 'border-neon-blue hover:border-neon-cyan'}`}
+        ${isDragActive ? 'border-neon-cyan bg-neon-cyan/10 ring-2 ring-neon-cyan/40' : 'border-neon-blue hover:border-neon-cyan hover:shadow-neon-cyan'}`}
     >
       <input {...getInputProps()} />
       <p className="text-text-primary">
